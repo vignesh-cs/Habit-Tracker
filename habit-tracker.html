@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#667eea">
+    <title>AI-Powered Smart Habit Tracker | Govt Exam & Skill Development</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+        }
+
+        .app-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin-bottom: 25px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .glass-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 30px 50px rgba(0, 0, 0, 0.15);
+        }
+
+        .animated-header {
+            background: linear-gradient(135deg, rgba(102,126,234,0.98) 0%, rgba(118,75,162,0.98) 100%);
+            border-radius: 30px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .animated-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            transform: rotate(45deg);
+            animation: shine 3s infinite;
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) rotate(45deg); }
+        }
+
+        .nav-tabs-custom {
+            border: none;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 60px;
+            padding: 8px;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-tabs-custom .nav-link {
+            border: none;
+            border-radius: 50px;
+            padding: 12px 28px;
+            font-weight: 600;
+            color: white;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-tabs-custom .nav-link.active {
+            background: white;
+            color: #667eea;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            transform: scale(1.05);
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 25px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px;
+            color: white;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card i {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+
+        .stat-card h3 {
+            font-size: 2rem;
+            margin: 10px 0;
+            font-weight: 800;
+        }
+
+        .ai-toggle-btn {
+            background: linear-gradient(135deg, #ff6b6b, #ff8e53);
+            border: none;
+            border-radius: 50px;
+            padding: 12px 24px;
+            font-weight: 700;
+            color: white;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+        }
+
+        .ai-toggle-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 107, 107, 0.6);
+        }
+
+        .ai-mode-active {
+            background: linear-gradient(135deg, #00c6fb, #005bea);
+            box-shadow: 0 5px 15px rgba(0, 91, 234, 0.4);
+        }
+
+        .topic-section {
+            margin-bottom: 25px;
+            border-radius: 20px;
+            overflow: hidden;
+            background: #f8f9fa;
+            transition: all 0.3s ease;
+        }
+
+        .topic-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 20px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .topic-content {
+            padding: 20px;
+            background: white;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .topic-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .topic-item {
+            background: linear-gradient(135deg, #f5f7fa 0%, #f8f9fa 100%);
+            padding: 12px 15px;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 1px solid #e0e0e0;
+        }
+
+        .topic-item:hover {
+            background: linear-gradient(135deg, #e3f2fd 0%, #f5f7fa 100%);
+            transform: translateX(5px);
+            border-color: #667eea;
+        }
+
+        .topic-item input {
+            margin-right: 12px;
+            transform: scale(1.2);
+            cursor: pointer;
+        }
+
+        .topic-item label {
+            cursor: pointer;
+            margin: 0;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .ai-suggestion-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px;
+            padding: 20px;
+            color: white;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+
+        .progress-custom {
+            height: 35px;
+            border-radius: 20px;
+            background: #e0e0e0;
+            overflow: hidden;
+        }
+
+        .progress-bar-custom {
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px;
+            transition: width 1.5s cubic-bezier(0.65, 0, 0.35, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        .form-control, .form-select {
+            border-radius: 15px;
+            border: 2px solid #e0e0e0;
+            padding: 12px 15px;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+            transform: translateY(-2px);
+        }
+
+        .rating {
+            display: flex;
+            flex-direction: row-reverse;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+        
+        .rating input {
+            display: none;
+        }
+        
+        .rating label {
+            cursor: pointer;
+            font-size: 35px;
+            color: #ddd;
+            transition: all 0.2s ease;
+        }
+        
+        .rating input:checked ~ label,
+        .rating label:hover,
+        .rating label:hover ~ label {
+            color: #ffc107;
+            transform: scale(1.1);
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .glass-card { padding: 20px; }
+            .nav-tabs-custom .nav-link { padding: 8px 12px; font-size: 12px; }
+            .topic-grid { grid-template-columns: 1fr; }
+            .stat-card h3 { font-size: 1.3rem; }
+        }
+
+        .chart-container {
+            max-height: 400px;
+            margin: 20px 0;
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+        }
+
+        .btn-action {
+            padding: 5px 10px;
+            margin: 0 3px;
+            border-radius: 8px;
+        }
+
+        .api-status {
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .api-status.success { color: #28a745; }
+        .api-status.error { color: #dc3545; }
+        .api-status.loading { color: #ffc107; }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="glass-card animated-header text-center mb-4">
+            <h1 style="font-size: 2.5rem; font-weight: 800;">
+                <i class="fas fa-brain"></i> AI-Powered Smart Habit Tracker
+            </h1>
+            <p class="mb-2">Government Exam Preparation & Skill Development</p>
+            <small><i class="fas fa-robot"></i> Powered by Groq AI (Llama 3) - Real AI Suggestions</small>
+            <div id="apiStatus" class="api-status mt-2"></div>
+        </div>
+        
+        <ul class="nav nav-tabs nav-tabs-custom justify-content-center mb-4" id="mainTabs" role="tablist">
+            <li class="nav-item">
+                <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#dashboard">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#daily">
+                    <i class="fas fa-plus-circle"></i> Daily Entry
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#weekly">
+                    <i class="fas fa-calendar-week"></i> Analytics
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#history">
+                    <i class="fas fa-history"></i> History
+                </button>
+            </li>
+        </ul>
+        
+        <div class="tab-content">
+            <div class="tab-pane fade show active" id="dashboard">
+                <div class="glass-card">
+                    <h3><i class="fas fa-chart-line"></i> Today's Overview</h3>
+                    <hr>
+                    <div class="row" id="todayStats"></div>
+                    <div class="mt-4">
+                        <h5>Weekly Progress</h5>
+                        <div class="progress-custom">
+                            <div class="progress-bar-custom" id="weeklyProgressBar" style="width: 0%">0%</div>
+                        </div>
+                        <p class="mt-2 text-center" id="weeklyProgressText"></p>
+                    </div>
+                </div>
+                
+                <div class="glass-card">
+                    <h5><i class="fas fa-chart-pie"></i> Topic Coverage Progress</h5>
+                    <div id="topicCoverageSummary"></div>
+                </div>
+                
+                <div class="glass-card">
+                    <h5><i class="fas fa-trophy"></i> Achievements & Streaks</h5>
+                    <div id="achievements" class="row"></div>
+                </div>
+            </div>
+            
+            <div class="tab-pane fade" id="daily">
+                <div class="glass-card">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h3><i class="fas fa-pen-alt"></i> Daily Activity Log</h3>
+                        <button class="btn ai-toggle-btn" id="aiModeToggle" onclick="toggleAIMode()">
+                            <i class="fas fa-robot"></i> AI Mode: <span id="aiModeStatus">OFF</span>
+                        </button>
+                    </div>
+                    <hr>
+                    <form id="dailyEntryForm">
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label"><i class="far fa-calendar-alt"></i> Date</label>
+                                <input type="date" class="form-control" id="entryDate" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label"><i class="fas fa-star"></i> Focus Score (1-5)</label>
+                                <div class="rating">
+                                    <input type="radio" name="rating" value="5" id="star5"><label for="star5">★</label>
+                                    <input type="radio" name="rating" value="4" id="star4"><label for="star4">★</label>
+                                    <input type="radio" name="rating" value="3" id="star3"><label for="star3">★</label>
+                                    <input type="radio" name="rating" value="2" id="star2"><label for="star2">★</label>
+                                    <input type="radio" name="rating" value="1" id="star1"><label for="star1">★</label>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label"><i class="fas fa-check-square"></i> Mock Test</label>
+                                <div class="form-check mt-2">
+                                    <input class="form-check-input" type="checkbox" id="mockTest" style="transform: scale(1.2);">
+                                    <label class="form-check-label" for="mockTest">Completed mock test today</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label"><i class="fas fa-book"></i> Study Hours (Max 6)</label>
+                                <input type="number" class="form-control" id="studyHours" min="0" max="6" step="0.5" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label"><i class="fas fa-code"></i> Coding Hours (Max 2)</label>
+                                <input type="number" class="form-control" id="codingHours" min="0" max="2" step="0.5" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label"><i class="fas fa-sync-alt"></i> Revision Hours (Max 2)</label>
+                                <input type="number" class="form-control" id="revisionHours" min="0" max="2" step="0.5" required>
+                            </div>
+                        </div>
+                        
+                        <div id="aiSuggestionCard" style="display: none;" class="ai-suggestion-card">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5><i class="fas fa-robot"></i> AI Study Suggestions (Powered by Groq)</h5>
+                                <button type="button" class="btn btn-sm btn-light" onclick="hideAISuggestion()">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            <div id="aiSuggestionContent">
+                                <div class="text-center">
+                                    <div class="loading-spinner"></div>
+                                    <p class="mt-2">AI is analyzing your progress with Groq Llama 3...</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="form-label"><i class="fas fa-tasks"></i> Topics Covered Today</label>
+                            <div id="topicsContainer"></div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label"><i class="fas fa-sticky-note"></i> Notes</label>
+                            <textarea class="form-control" id="notes" rows="3" placeholder="Any remarks or observations..."></textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Completion Percentage: <span id="completionPreview">0</span>%</label>
+                            <div class="progress-custom">
+                                <div class="progress-bar-custom" id="previewBar" style="width: 0%">0%</div>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary w-100" style="padding: 12px; font-weight: 600;">
+                            <i class="fas fa-save"></i> Save Entry
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="tab-pane fade" id="weekly">
+                <div class="glass-card">
+                    <h3><i class="fas fa-chart-bar"></i> Performance Analytics</h3>
+                    <hr>
+                    <div class="row mb-4">
+                        <div class="col-md-3 col-6">
+                            <div class="stat-card">
+                                <i class="fas fa-clock"></i>
+                                <h3 id="totalHoursWeekly">0</h3>
+                                <small>Total Hours</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-6">
+                            <div class="stat-card">
+                                <i class="fas fa-chart-line"></i>
+                                <h3 id="avgCompletionWeekly">0</h3>
+                                <small>Avg Completion</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-6">
+                            <div class="stat-card">
+                                <i class="fas fa-star"></i>
+                                <h3 id="avgFocusWeekly">0</h3>
+                                <small>Avg Focus</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-6">
+                            <div class="stat-card">
+                                <i class="fas fa-tasks"></i>
+                                <h3 id="mockTestsWeekly">0</h3>
+                                <small>Mock Tests</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <canvas id="weeklyChart"></canvas>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <h5><i class="fas fa-exclamation-triangle"></i> Areas for Improvement</h5>
+                        <div id="weakAreas" class="alert alert-warning"></div>
+                    </div>
+                    
+                    <div class="mt-3">
+                        <h5><i class="fas fa-lightbulb"></i> AI-Powered Recommendations</h5>
+                        <div id="suggestions" class="alert alert-info"></div>
+                    </div>
+                    
+                    <button class="btn btn-success mt-3" onclick="exportWeeklyPDF()">
+                        <i class="fas fa-file-pdf"></i> Export Report as PDF
+                    </button>
+                </div>
+            </div>
+            
+            <div class="tab-pane fade" id="history">
+                <div class="glass-card">
+                    <h3><i class="fas fa-search"></i> Study History</h3>
+                    <hr>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Filter by Date</label>
+                            <input type="date" class="form-control" id="filterDate">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Search Notes</label>
+                            <input type="text" class="form-control" id="searchInput" placeholder="Search...">
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover" id="historyTable">
+                            <thead>
+                                <tr><th>Date</th><th>Study</th><th>Coding</th><th>Revision</th><th>Topics</th><th>Completion</th><th>Focus</th><th>Actions</th></tr>
+                            </thead>
+                            <tbody id="historyTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const topicsData = {
+            "Quantitative Aptitude": {
+                topics: ["Simplification", "Number Series", "Quadratic Equations", "Profit & Loss", "Time & Work", "Time, Speed & Distance", "Ratio & Proportion", "Percentage", "Data Interpretation", "Probability"]
+            },
+            "Reasoning": {
+                topics: ["Puzzles", "Syllogism", "Coding-Decoding", "Blood Relations", "Direction Sense", "Inequality", "Logical Reasoning"]
+            },
+            "English": {
+                topics: ["Reading Comprehension", "Cloze Test", "Error Detection", "Para Jumbles", "Fill in the blanks", "Vocabulary"]
+            },
+            "General Awareness": {
+                topics: ["Banking Awareness", "Current Affairs", "Static GK", "RBI Topics"]
+            },
+            "Coding": {
+                topics: ["Python Basics", "Functions", "Data Structures", "OOP", "File Handling", "APIs"]
+            },
+            "Gen AI": {
+                topics: ["NLP Basics", "Transformers", "LLMs", "Prompt Engineering", "APIs"]
+            }
+        };
+        
+        let habitData = JSON.parse(localStorage.getItem('habitTracker')) || [];
+        let weeklyChart = null;
+        let aiModeEnabled = false;
+        
+        // Groq API Configuration - Using current available models
+        const GROQ_API_KEY = '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';
+        const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
+        // Updated to use the current available model - llama-3.3-70b-versatile is the latest
+        const GROQ_MODEL = 'llama-3.3-70b-versatile';
+        
+        function generateTopicsHTML() {
+            let html = '';
+            let sectionIndex = 0;
+            
+            for (let [category, data] of Object.entries(topicsData)) {
+                html += `
+                    <div class="topic-section">
+                        <div class="topic-header" onclick="toggleSection(${sectionIndex})">
+                            <i class="fas fa-chevron-down"></i> ${category}
+                        </div>
+                        <div class="topic-content" id="section-${sectionIndex}" style="display: block;">
+                            <button type="button" class="btn btn-sm btn-outline-primary mb-2" onclick="toggleAllTopics(${sectionIndex})">
+                                <i class="fas fa-check-double"></i> Toggle All
+                            </button>
+                            <div class="topic-grid">
+                `;
+                
+                data.topics.forEach(topic => {
+                    let topicId = `${category}_${topic}`.replace(/[^a-zA-Z0-9]/g, '_');
+                    html += `
+                        <div class="topic-item">
+                            <input type="checkbox" class="topic-checkbox" data-category="${category}" data-topic="${topic}" id="${topicId}">
+                            <label for="${topicId}">${topic}</label>
+                        </div>
+                    `;
+                });
+                
+                html += `</div></div></div>`;
+                sectionIndex++;
+            }
+            return html;
+        }
+        
+        function toggleSection(index) {
+            const section = document.getElementById(`section-${index}`);
+            if (section.style.display === 'none') {
+                section.style.display = 'block';
+            } else {
+                section.style.display = 'none';
+            }
+        }
+        
+        function toggleAllTopics(sectionIndex) {
+            const section = document.getElementById(`section-${sectionIndex}`);
+            const checkboxes = section.querySelectorAll('.topic-checkbox');
+            const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+            checkboxes.forEach(cb => cb.checked = !allChecked);
+        }
+        
+        async function toggleAIMode() {
+            aiModeEnabled = !aiModeEnabled;
+            const statusSpan = document.getElementById('aiModeStatus');
+            const toggleBtn = document.getElementById('aiModeToggle');
+            
+            if (aiModeEnabled) {
+                statusSpan.textContent = 'ON';
+                toggleBtn.classList.add('ai-mode-active');
+                await fetchRealAISuggestions();
+            } else {
+                statusSpan.textContent = 'OFF';
+                toggleBtn.classList.remove('ai-mode-active');
+                document.getElementById('aiSuggestionCard').style.display = 'none';
+                document.getElementById('topicsContainer').innerHTML = generateTopicsHTML();
+            }
+        }
+        
+        async function fetchRealAISuggestions() {
+            document.getElementById('aiSuggestionCard').style.display = 'block';
+            const aiContent = document.getElementById('aiSuggestionContent');
+            const userProgress = getUserProgressSummary();
+            
+            const apiStatus = document.getElementById('apiStatus');
+            apiStatus.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Connecting to Groq AI...';
+            apiStatus.className = 'api-status loading';
+            
+            try {
+                const prompt = `As an AI study coach for government exam preparation, analyze this student's data and provide specific topic recommendations:
+
+Student Progress Data:
+- Total study hours: ${userProgress.totalStudyHours}
+- Average completion rate: ${userProgress.avgCompletion}%
+- Average focus score: ${userProgress.avgFocus}/5
+- Topics already covered: ${JSON.stringify(userProgress.coveredTopics)}
+- Total days tracked: ${userProgress.totalEntries}
+
+Based on this data, provide EXACTLY 5 specific topics they should study today from these categories: Quantitative Aptitude, Reasoning, English, General Awareness, Coding, Gen AI.
+
+Format your response exactly like this:
+1. [Topic Name] - [Brief reason why they need to study this based on their data]
+2. [Topic Name] - [Brief reason]
+3. [Topic Name] - [Brief reason]
+4. [Topic Name] - [Brief reason]
+5. [Topic Name] - [Brief reason]
+
+Make it personalized based on their weak areas. Be specific and actionable.`;
+                
+                const response = await fetch(GROQ_API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${GROQ_API_KEY}`
+                    },
+                    body: JSON.stringify({
+                        model: GROQ_MODEL,
+                        messages: [
+                            {
+                                role: "system",
+                                content: "You are an expert study coach for government exam preparation. Provide specific, actionable topic recommendations based on student data. Always respond with exactly 5 numbered topics with brief explanations."
+                            },
+                            {
+                                role: "user",
+                                content: prompt
+                            }
+                        ],
+                        temperature: 0.7,
+                        max_tokens: 600,
+                        top_p: 0.9
+                    })
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.text();
+                    console.error('API Error Response:', errorData);
+                    throw new Error(`API Error: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                console.log('Groq API Response:', data);
+                
+                if (data.choices && data.choices[0] && data.choices[0].message) {
+                    const aiResponse = data.choices[0].message.content;
+                    const suggestedTopics = parseAITopics(aiResponse);
+                    applyAITopicsToCheckboxes(suggestedTopics);
+                    
+                    aiContent.innerHTML = `
+                        <div class="ai-response" style="max-height: 400px; overflow-y: auto;">
+                            <strong>🤖 AI Analysis (Groq ${GROQ_MODEL}):</strong><br><br>
+                            ${aiResponse.replace(/\n/g, '<br>')}
+                        </div>
+                        <div class="mt-3">
+                            <button class="btn btn-sm btn-light" onclick="applyAISuggestions()">
+                                <i class="fas fa-check"></i> Apply These Topics
+                            </button>
+                            <button class="btn btn-sm btn-outline-light ms-2" onclick="refreshAISuggestions()">
+                                <i class="fas fa-sync-alt"></i> Get New Suggestions
+                            </button>
+                        </div>
+                    `;
+                    
+                    apiStatus.innerHTML = '<i class="fas fa-check-circle"></i> Groq AI connected successfully!';
+                    apiStatus.className = 'api-status success';
+                    setTimeout(() => { apiStatus.innerHTML = ''; }, 3000);
+                } else {
+                    throw new Error('Invalid response format from Groq API');
+                }
+                
+            } catch (error) {
+                console.error('Detailed AI Error:', error);
+                apiStatus.innerHTML = `<i class="fas fa-exclamation-triangle"></i> API Error: ${error.message}`;
+                apiStatus.className = 'api-status error';
+                
+                aiContent.innerHTML = `
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle"></i> Unable to fetch AI suggestions.<br>
+                        <small>Error: ${error.message}</small><br><br>
+                        <strong>Using fallback suggestions instead:</strong><br>
+                        Based on your progress, focus on these topics:
+                    </div>
+                    <div class="mt-2">
+                        ${generateFallbackSuggestions()}
+                    </div>
+                    <button class="btn btn-sm btn-light mt-3" onclick="applyFallbackSuggestions()">
+                        <i class="fas fa-check"></i> Apply These Topics
+                    </button>
+                `;
+            }
+        }
+        
+        function generateFallbackSuggestions() {
+            const userProgress = getUserProgressSummary();
+            let suggestions = [];
+            
+            if (userProgress.avgCompletion < 50) {
+                suggestions.push("📚 Simplification - Build your calculation speed");
+                suggestions.push("📊 Data Interpretation - Practice daily");
+                suggestions.push("🎯 Puzzles - Improve logical thinking");
+            } else if (userProgress.avgFocus < 3) {
+                suggestions.push("🧘 Focus Techniques - Try Pomodoro method");
+                suggestions.push("📖 Reading Comprehension - Build concentration");
+                suggestions.push("✍️ Error Detection - Attention to detail");
+            } else {
+                suggestions.push("🚀 Advanced Quant - Time & Work problems");
+                suggestions.push("💻 Python Functions - Practice coding");
+                suggestions.push("🤖 Gen AI Basics - Understand transformers");
+            }
+            
+            suggestions.push("📰 Current Affairs - Daily news review");
+            suggestions.push("📝 Mock Test Analysis - Review mistakes");
+            
+            return suggestions.map(s => `<div class="mb-2">${s}</div>`).join('');
+        }
+        
+        function applyFallbackSuggestions() {
+            const fallbackTopics = ["Simplification", "Data Interpretation", "Puzzles", "Reading Comprehension", "Python Functions", "Current Affairs"];
+            document.querySelectorAll('.topic-checkbox').forEach(cb => cb.checked = false);
+            fallbackTopics.forEach(topic => {
+                document.querySelectorAll('.topic-checkbox').forEach(cb => {
+                    if (cb.getAttribute('data-topic').toLowerCase().includes(topic.toLowerCase())) {
+                        cb.checked = true;
+                    }
+                });
+            });
+            document.getElementById('aiSuggestionCard').style.display = 'none';
+            alert('Fallback suggestions applied!');
+        }
+        
+        function parseAITopics(aiResponse) {
+            const topics = [];
+            const lines = aiResponse.split('\n');
+            
+            for (let line of lines) {
+                if (line.match(/^\d+\./) || line.match(/^[•\-]/)) {
+                    let topic = line.replace(/^\d+\.\s*/, '').replace(/^[•\-]\s*/, '');
+                    if (topic.includes(' - ')) {
+                        topic = topic.split(' - ')[0];
+                    }
+                    if (topic.includes(':')) {
+                        topic = topic.split(':')[0];
+                    }
+                    topic = topic.trim();
+                    if (topic.length > 3 && topic.length < 60) {
+                        topics.push(topic);
+                    }
+                }
+            }
+            return topics.slice(0, 7);
+        }
+        
+        function applyAITopicsToCheckboxes(suggestedTopics) {
+            document.querySelectorAll('.topic-checkbox').forEach(cb => cb.checked = false);
+            
+            suggestedTopics.forEach(suggested => {
+                document.querySelectorAll('.topic-checkbox').forEach(cb => {
+                    const topicName = cb.getAttribute('data-topic');
+                    if (topicName.toLowerCase().includes(suggested.toLowerCase()) || 
+                        suggested.toLowerCase().includes(topicName.toLowerCase())) {
+                        cb.checked = true;
+                    }
+                });
+            });
+            
+            const anyChecked = Array.from(document.querySelectorAll('.topic-checkbox:checked')).length > 0;
+            if (!anyChecked && suggestedTopics.length > 0) {
+                const defaultTopics = ["Simplification", "Profit & Loss", "Puzzles", "Reading Comprehension", "Python Basics"];
+                defaultTopics.forEach(topic => {
+                    document.querySelectorAll('.topic-checkbox').forEach(cb => {
+                        if (cb.getAttribute('data-topic') === topic) {
+                            cb.checked = true;
+                        }
+                    });
+                });
+            }
+        }
+        
+        function getUserProgressSummary() {
+            const last7Days = getLast7Days();
+            const weeklyEntries = habitData.filter(entry => last7Days.includes(entry.date));
+            
+            let coveredTopics = {};
+            habitData.forEach(entry => {
+                if (entry.topics) {
+                    for (let [category, topics] of Object.entries(entry.topics)) {
+                        if (!coveredTopics[category]) coveredTopics[category] = [];
+                        coveredTopics[category].push(...topics);
+                    }
+                }
+            });
+            
+            return {
+                totalStudyHours: habitData.reduce((sum, e) => sum + e.studyHours, 0),
+                avgCompletion: weeklyEntries.length > 0 ? weeklyEntries.reduce((sum, e) => sum + e.completion, 0) / weeklyEntries.length : 0,
+                avgFocus: weeklyEntries.length > 0 ? weeklyEntries.reduce((sum, e) => sum + e.focusScore, 0) / weeklyEntries.length : 0,
+                coveredTopics: coveredTopics,
+                totalEntries: habitData.length
+            };
+        }
+        
+        function refreshAISuggestions() {
+            fetchRealAISuggestions();
+        }
+        
+        function applyAISuggestions() {
+            document.getElementById('aiSuggestionCard').style.display = 'none';
+            alert('AI suggestions applied! You can now select topics from the list.');
+        }
+        
+        function hideAISuggestion() {
+            document.getElementById('aiSuggestionCard').style.display = 'none';
+        }
+        
+        function getSelectedTopics() {
+            let selected = {};
+            document.querySelectorAll('.topic-checkbox:checked').forEach(cb => {
+                let category = cb.getAttribute('data-category');
+                let topic = cb.getAttribute('data-topic');
+                if (!selected[category]) selected[category] = [];
+                selected[category].push(topic);
+            });
+            return selected;
+        }
+        
+        function calculateCompletion(study, coding, revision) {
+            let studyPercent = (study / 6) * 100;
+            let codingPercent = (coding / 2) * 100;
+            let revisionPercent = (revision / 2) * 100;
+            return Math.round((studyPercent + codingPercent + revisionPercent) / 3);
+        }
+        
+        function updateCompletionPreview() {
+            let study = parseFloat(document.getElementById('studyHours').value) || 0;
+            let coding = parseFloat(document.getElementById('codingHours').value) || 0;
+            let revision = parseFloat(document.getElementById('revisionHours').value) || 0;
+            let completion = calculateCompletion(study, coding, revision);
+            document.getElementById('completionPreview').textContent = completion;
+            document.getElementById('previewBar').style.width = completion + '%';
+            document.getElementById('previewBar').textContent = completion + '%';
+        }
+        
+        function saveEntry(e) {
+            e.preventDefault();
+            
+            let date = document.getElementById('entryDate').value;
+            if (!date) {
+                alert('Please select a date');
+                return;
+            }
+            
+            let studyHours = parseFloat(document.getElementById('studyHours').value) || 0;
+            let codingHours = parseFloat(document.getElementById('codingHours').value) || 0;
+            let revisionHours = parseFloat(document.getElementById('revisionHours').value) || 0;
+            
+            if (studyHours > 6 || codingHours > 2 || revisionHours > 2) {
+                alert('Please enter hours within limits');
+                return;
+            }
+            
+            let focusScore = document.querySelector('input[name="rating"]:checked');
+            let focus = focusScore ? parseInt(focusScore.value) : 3;
+            let selectedTopics = getSelectedTopics();
+            let mockTest = document.getElementById('mockTest').checked;
+            let notes = document.getElementById('notes').value;
+            let completion = calculateCompletion(studyHours, codingHours, revisionHours);
+            
+            let newEntry = {
+                id: Date.now(),
+                date: date,
+                studyHours: studyHours,
+                codingHours: codingHours,
+                revisionHours: revisionHours,
+                focusScore: focus,
+                topics: selectedTopics,
+                mockTest: mockTest,
+                notes: notes,
+                completion: completion
+            };
+            
+            let existingIndex = habitData.findIndex(entry => entry.date === date);
+            if (existingIndex !== -1) {
+                if (confirm('Update existing entry?')) {
+                    habitData[existingIndex] = newEntry;
+                } else {
+                    return;
+                }
+            } else {
+                habitData.push(newEntry);
+            }
+            
+            localStorage.setItem('habitTracker', JSON.stringify(habitData));
+            
+            document.getElementById('dailyEntryForm').reset();
+            document.getElementById('entryDate').value = new Date().toISOString().split('T')[0];
+            document.querySelectorAll('input[name="rating"]').forEach(r => r.checked = false);
+            document.querySelectorAll('.topic-checkbox').forEach(cb => cb.checked = false);
+            document.getElementById('mockTest').checked = false;
+            document.getElementById('notes').value = '';
+            document.getElementById('studyHours').value = '';
+            document.getElementById('codingHours').value = '';
+            document.getElementById('revisionHours').value = '';
+            
+            loadData();
+            updateDashboard();
+            updateWeeklyReport();
+            updateHistoryTable();
+            
+            alert('Entry saved successfully!');
+        }
+        
+        function loadData() {
+            habitData = JSON.parse(localStorage.getItem('habitTracker')) || [];
+        }
+        
+        function updateDashboard() {
+            let today = new Date().toISOString().split('T')[0];
+            let todayEntry = habitData.find(entry => entry.date === today);
+            
+            if (todayEntry) {
+                document.getElementById('todayStats').innerHTML = `
+                    <div class="col-md-3 col-6"><div class="stat-card"><i class="fas fa-book"></i><h3>${todayEntry.studyHours}h</h3><small>Study Hours</small></div></div>
+                    <div class="col-md-3 col-6"><div class="stat-card"><i class="fas fa-code"></i><h3>${todayEntry.codingHours}h</h3><small>Coding Hours</small></div></div>
+                    <div class="col-md-3 col-6"><div class="stat-card"><i class="fas fa-sync-alt"></i><h3>${todayEntry.revisionHours}h</h3><small>Revision Hours</small></div></div>
+                    <div class="col-md-3 col-6"><div class="stat-card"><i class="fas fa-percent"></i><h3>${todayEntry.completion}%</h3><small>Completion</small></div></div>
+                `;
+            } else {
+                document.getElementById('todayStats').innerHTML = `<div class="col-12 text-center"><div class="alert alert-info">No entry for today. Start tracking!</div></div>`;
+            }
+            
+            let allTopics = {};
+            habitData.forEach(entry => {
+                if (entry.topics) {
+                    for (let [category, topics] of Object.entries(entry.topics)) {
+                        if (!allTopics[category]) allTopics[category] = new Set();
+                        topics.forEach(topic => allTopics[category].add(topic));
+                    }
+                }
+            });
+            
+            let summaryHtml = '<div class="row">';
+            for (let [category, topics] of Object.entries(allTopics)) {
+                let totalTopics = topicsData[category] ? topicsData[category].topics.length : 0;
+                let coveredCount = topics.size;
+                let percentage = totalTopics > 0 ? Math.round((coveredCount / totalTopics) * 100) : 0;
+                summaryHtml += `<div class="col-md-4 mb-3"><div class="card border-0 shadow-sm"><div class="card-body"><h6 class="fw-bold">${category}</h6><div class="progress-custom" style="height: 25px;"><div class="progress-bar-custom" style="width: ${percentage}%">${percentage}%</div></div><small class="text-muted">${coveredCount}/${totalTopics} topics covered</small></div></div></div>`;
+            }
+            summaryHtml += '</div>';
+            document.getElementById('topicCoverageSummary').innerHTML = summaryHtml || '<p>Start tracking topics!</p>';
+            
+            let streak = calculateStreak();
+            let totalDays = habitData.length;
+            let avgFocus = habitData.length > 0 ? habitData.reduce((sum, e) => sum + e.focusScore, 0) / habitData.length : 0;
+            
+            document.getElementById('achievements').innerHTML = `
+                <div class="col-md-4"><div class="stat-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);"><i class="fas fa-fire"></i><h3>${streak}</h3><small>Day Streak</small></div></div>
+                <div class="col-md-4"><div class="stat-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);"><i class="fas fa-calendar-check"></i><h3>${totalDays}</h3><small>Total Days</small></div></div>
+                <div class="col-md-4"><div class="stat-card" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);"><i class="fas fa-star"></i><h3>${avgFocus.toFixed(1)}</h3><small>Avg Focus</small></div></div>
+            `;
+            
+            let last7Days = getLast7Days();
+            let weeklyEntries = habitData.filter(entry => last7Days.includes(entry.date));
+            let avgCompletion = weeklyEntries.length > 0 ? weeklyEntries.reduce((sum, entry) => sum + entry.completion, 0) / weeklyEntries.length : 0;
+            document.getElementById('weeklyProgressBar').style.width = avgCompletion + '%';
+            document.getElementById('weeklyProgressBar').textContent = Math.round(avgCompletion) + '%';
+            document.getElementById('weeklyProgressText').textContent = Math.round(avgCompletion) + '% average completion this week';
+        }
+        
+        function calculateStreak() {
+            if (habitData.length === 0) return 0;
+            let sortedDates = habitData.map(e => e.date).sort();
+            let streak = 1;
+            let currentDate = new Date(sortedDates[sortedDates.length - 1]);
+            for (let i = sortedDates.length - 2; i >= 0; i--) {
+                let prevDate = new Date(sortedDates[i]);
+                let diffDays = Math.floor((currentDate - prevDate) / (1000 * 60 * 60 * 24));
+                if (diffDays === 1) {
+                    streak++;
+                    currentDate = prevDate;
+                } else if (diffDays > 1) break;
+            }
+            return streak;
+        }
+        
+        function getLast7Days() {
+            let dates = [];
+            for (let i = 6; i >= 0; i--) {
+                let date = new Date();
+                date.setDate(date.getDate() - i);
+                dates.push(date.toISOString().split('T')[0]);
+            }
+            return dates;
+        }
+        
+        function updateWeeklyReport() {
+            let last7Days = getLast7Days();
+            let weeklyEntries = habitData.filter(entry => last7Days.includes(entry.date));
+            
+            let totalHours = weeklyEntries.reduce((sum, entry) => sum + entry.studyHours + entry.codingHours + entry.revisionHours, 0);
+            let avgCompletion = weeklyEntries.length > 0 ? weeklyEntries.reduce((sum, entry) => sum + entry.completion, 0) / weeklyEntries.length : 0;
+            let avgFocus = weeklyEntries.length > 0 ? weeklyEntries.reduce((sum, entry) => sum + entry.focusScore, 0) / weeklyEntries.length : 0;
+            let mockTests = weeklyEntries.filter(entry => entry.mockTest).length;
+            
+            document.getElementById('totalHoursWeekly').textContent = totalHours;
+            document.getElementById('avgCompletionWeekly').textContent = Math.round(avgCompletion) + '%';
+            document.getElementById('avgFocusWeekly').textContent = avgFocus.toFixed(1);
+            document.getElementById('mockTestsWeekly').textContent = mockTests;
+            
+            let dailyCompletion = last7Days.map(date => {
+                let entry = habitData.find(e => e.date === date);
+                return entry ? entry.completion : 0;
+            });
+            
+            if (weeklyChart) weeklyChart.destroy();
+            let ctx = document.getElementById('weeklyChart').getContext('2d');
+            weeklyChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: last7Days.map(d => new Date(d).toLocaleDateString()),
+                    datasets: [{
+                        label: 'Daily Completion %',
+                        data: dailyCompletion,
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        borderWidth: 3,
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: true }
+            });
+            
+            let weakAreas = [];
+            if (avgCompletion < 50) weakAreas.push('📚 Low completion rate - need more consistent study');
+            if (avgFocus < 3) weakAreas.push('🎯 Focus score needs improvement');
+            if (mockTests < 2) weakAreas.push('📝 Take more mock tests');
+            if (totalHours < 35) weakAreas.push('⏰ Increase total study hours');
+            
+            document.getElementById('weakAreas').innerHTML = weakAreas.length > 0 ? weakAreas.map(w => `<div class="mb-2">${w}</div>`).join('') : '🎉 Excellent performance!';
+            
+            let suggestions = [];
+            if (totalHours < 40) suggestions.push('Set a daily goal of 6 study hours');
+            if (avgFocus < 3) suggestions.push('Use Pomodoro technique');
+            if (mockTests < 2) suggestions.push('Schedule weekly mock tests');
+            if (suggestions.length === 0) suggestions.push('🌟 Keep up the great work!');
+            
+            document.getElementById('suggestions').innerHTML = suggestions.map(s => `💡 ${s}`).join('<br>');
+        }
+        
+        function updateHistoryTable() {
+            let filterDate = document.getElementById('filterDate').value;
+            let searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            
+            let filteredData = habitData;
+            if (filterDate) filteredData = filteredData.filter(entry => entry.date === filterDate);
+            if (searchTerm) filteredData = filteredData.filter(entry => entry.notes.toLowerCase().includes(searchTerm));
+            filteredData.sort((a, b) => b.date.localeCompare(a.date));
+            
+            let tbody = document.getElementById('historyTableBody');
+            if (filteredData.length === 0) {
+                tbody.innerHTML = '发展<td colspan="8" class="text-center">No entries found</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = filteredData.map(entry => {
+                let topicsCount = 0;
+                if (entry.topics) {
+                    for (let cat in entry.topics) topicsCount += entry.topics[cat].length;
+                }
+                return `<tr><td><strong>${entry.date}</strong></td><td>${entry.studyHours}h</td><td>${entry.codingHours}h</td><td>${entry.revisionHours}h</td><td><span class="badge bg-success">${topicsCount} topics</span></td><td><span class="badge bg-primary">${entry.completion}%</span></td><td><span class="badge bg-warning">${entry.focusScore}/5</span></td><td><button class="btn btn-sm btn-info btn-action" onclick="viewEntry(${entry.id})"><i class="fas fa-eye"></i></button> <button class="btn btn-sm btn-danger btn-action" onclick="deleteEntry(${entry.id})"><i class="fas fa-trash"></i></button></td></tr>`;
+            }).join('');
+        }
+        
+        function viewEntry(id) {
+            let entry = habitData.find(e => e.id === id);
+            if (entry) {
+                let topicsText = '';
+                if (entry.topics) {
+                    for (let [category, topics] of Object.entries(entry.topics)) {
+                        topicsText += `\n${category}: ${topics.join(', ')}`;
+                    }
+                }
+                alert(`📅 Date: ${entry.date}\n📚 Study: ${entry.studyHours}h | 💻 Coding: ${entry.codingHours}h | 🔄 Revision: ${entry.revisionHours}h\n⭐ Focus Score: ${entry.focusScore}/5\n📖 Topics Covered:${topicsText || ' None'}\n📝 Mock Test: ${entry.mockTest ? 'Yes' : 'No'}\n💭 Notes: ${entry.notes || 'No notes'}`);
+            }
+        }
+        
+        function deleteEntry(id) {
+            if (confirm('Delete this entry permanently?')) {
+                habitData = habitData.filter(entry => entry.id !== id);
+                localStorage.setItem('habitTracker', JSON.stringify(habitData));
+                loadData();
+                updateDashboard();
+                updateWeeklyReport();
+                updateHistoryTable();
+                alert('Entry deleted successfully!');
+            }
+        }
+        
+        function exportWeeklyPDF() {
+            const element = document.getElementById('weekly');
+            html2pdf().set({ margin: 1, filename: `weekly_report_${new Date().toISOString().split('T')[0]}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } }).from(element).save();
+        }
+        
+        // Initialize
+        document.getElementById('topicsContainer').innerHTML = generateTopicsHTML();
+        document.getElementById('dailyEntryForm').addEventListener('submit', saveEntry);
+        document.getElementById('studyHours').addEventListener('input', updateCompletionPreview);
+        document.getElementById('codingHours').addEventListener('input', updateCompletionPreview);
+        document.getElementById('revisionHours').addEventListener('input', updateCompletionPreview);
+        document.getElementById('filterDate').addEventListener('change', updateHistoryTable);
+        document.getElementById('searchInput').addEventListener('input', updateHistoryTable);
+        
+        loadData();
+        updateDashboard();
+        updateWeeklyReport();
+        updateHistoryTable();
+        document.getElementById('entryDate').value = new Date().toISOString().split('T')[0];
+    </script>
+</body>
+</html>
